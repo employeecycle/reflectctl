@@ -24,7 +24,9 @@ import (
 	"os"
 	"strings"
 	"text/tabwriter"
+	"time"
 
+	"github.com/gosuri/uilive"
 	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -83,6 +85,25 @@ to quickly create a Cobra application.`,
 
 		if jsonFormat {
 			format = "json"
+		}
+
+		watch, err := cmd.Flags().GetBool("watch")
+		if err != nil {
+			return err
+		}
+
+		if watch {
+			writer := uilive.New()
+			writer.Start()
+
+			// TODO: Better terminal case
+			for i := 0; i <= 100; i++ {
+				output, _ = r.GetStatus(id)
+				text, _ := render(output, format)
+				fmt.Fprintf(writer, text)
+				time.Sleep(3 * time.Second)
+			}
+			return nil
 		}
 
 		text, err := render(output, format)
