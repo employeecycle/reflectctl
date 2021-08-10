@@ -16,6 +16,7 @@ limitations under the License.
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -78,20 +79,39 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
+		format := ""
+
 		if jsonFormat {
-			jsonOutput, err := json.Marshal(output)
-
-			if err != nil {
-				return nil
-			}
-
-			fmt.Println(string(jsonOutput))
-			return nil
+			format = "json"
 		}
 
-		w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
+		text, err := render(output, format)
 
-		fmt.Println(fmt.Sprintf("\nStatus for execution %v:\n", output.ExecutionID))
+		fmt.Println(text)
+
+		return nil
+	},
+}
+
+func render(output *reflect.GetStatusOutput, format string) (string, error) {
+	result := ""
+	var resultErr error
+
+	switch format {
+	case "json":
+		jsonOutput, err := json.Marshal(output)
+
+		if err != nil {
+			resultErr = err
+			break
+		}
+
+		result = string(jsonOutput)
+	default:
+		var buf bytes.Buffer
+		w := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
+
+		fmt.Fprintln(w, fmt.Sprintf("\nStatus for execution %v:\n", output.ExecutionID))
 
 		fmt.Fprintln(w, "Test ID\tStats\tStarted\tCompleted\tDuration (s)\tRun ID")
 
@@ -103,8 +123,16 @@ to quickly create a Cobra application.`,
 
 		w.Flush()
 
-		return nil
-	},
+		buffResult, err := ioutil.ReadAll(&buf)
+		if err != nil {
+			resultErr = err
+			break
+		}
+
+		result = string(buffResult)
+	}
+
+	return result, resultErr
 }
 
 func isInputFromPipe() bool {
@@ -124,4 +152,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// executionStatusCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	executionStatusCmd.Flags().BoolP("watch", "w", false, "Watch live output")
 }
