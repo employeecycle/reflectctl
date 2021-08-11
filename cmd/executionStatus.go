@@ -26,6 +26,7 @@ import (
 	"text/tabwriter"
 	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/gosuri/uilive"
 	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 	"github.com/spf13/cobra"
@@ -96,8 +97,9 @@ to quickly create a Cobra application.`,
 			writer := uilive.New()
 			writer.Start()
 			allComplete := false
+			s := spinner.New(spinner.CharSets[4], 100*time.Millisecond)
+			s.Start()
 
-			// TODO: Better terminal case
 			for allComplete == false {
 				output, _ = r.GetStatus(id)
 				text, _ := render(output, format)
@@ -105,6 +107,8 @@ to quickly create a Cobra application.`,
 				time.Sleep(3 * time.Second)
 				allComplete = areAllTestsComplete(output)
 			}
+
+			s.Stop()
 			return nil
 		}
 
@@ -136,7 +140,7 @@ func render(output *reflect.GetStatusOutput, format string) (string, error) {
 
 		fmt.Fprintln(w, fmt.Sprintf("\nStatus for execution %v:\n", output.ExecutionID))
 
-		fmt.Fprintln(w, "Test ID\tStats\tStarted\tCompleted\tDuration (s)\tRun ID")
+		fmt.Fprintln(w, "Test ID\tStatus\tStarted\tCompleted\tDuration (s)\tRun ID")
 
 		for _, test := range output.Tests {
 			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, millisecondsToTime(test.Started), millisecondsToTime(test.Completed), displayDuration(test.Completed, test.Started), test.RunID)
