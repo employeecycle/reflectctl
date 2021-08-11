@@ -95,13 +95,15 @@ to quickly create a Cobra application.`,
 		if watch {
 			writer := uilive.New()
 			writer.Start()
+			allComplete := false
 
 			// TODO: Better terminal case
-			for i := 0; i <= 100; i++ {
+			for allComplete == false {
 				output, _ = r.GetStatus(id)
 				text, _ := render(output, format)
 				fmt.Fprintf(writer, text)
 				time.Sleep(3 * time.Second)
+				allComplete = areAllTestsComplete(output)
 			}
 			return nil
 		}
@@ -137,8 +139,7 @@ func render(output *reflect.GetStatusOutput, format string) (string, error) {
 		fmt.Fprintln(w, "Test ID\tStats\tStarted\tCompleted\tDuration (s)\tRun ID")
 
 		for _, test := range output.Tests {
-			duration := float32(test.Completed-test.Started) / float32(1000)
-			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, test.Started, test.Completed, duration, test.RunID)
+			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, millisecondsToTime(test.Started), millisecondsToTime(test.Completed), displayDuration(test.Completed, test.Started), test.RunID)
 			fmt.Fprintln(w, line)
 		}
 
@@ -154,6 +155,32 @@ func render(output *reflect.GetStatusOutput, format string) (string, error) {
 	}
 
 	return result, resultErr
+}
+
+func millisecondsToTime(t int) time.Time {
+	return time.Unix(int64(t/1000), 0)
+}
+
+func displayDuration(start int, end int) string {
+	if end == 0 || start == 0 {
+		return "-"
+	}
+
+	duration := float32(start-end) / float32(1000)
+
+	return fmt.Sprintf("%v", duration)
+}
+
+func areAllTestsComplete(output *reflect.GetStatusOutput) bool {
+	numComplete := 0
+
+	for _, test := range output.Tests {
+		if (test.Status == "succeeded") || (test.Status == "failed") {
+			numComplete++
+		}
+	}
+
+	return numComplete == len(output.Tests)
 }
 
 func isInputFromPipe() bool {
