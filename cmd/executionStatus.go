@@ -46,7 +46,7 @@ to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var id string
 
-		if isInputFromPipe() {
+		if IsInputFromPipe() {
 			buffer, err := ioutil.ReadAll(os.Stdin)
 			if err != nil {
 				return err
@@ -105,7 +105,7 @@ to quickly create a Cobra application.`,
 				text, _ := render(output, format)
 				fmt.Fprintf(writer, text)
 				time.Sleep(3 * time.Second)
-				allComplete = areAllTestsComplete(output)
+				allComplete = AreAllTestsComplete(output)
 			}
 
 			s.Stop()
@@ -143,7 +143,7 @@ func render(output *reflect.GetStatusOutput, format string) (string, error) {
 		fmt.Fprintln(w, "Test ID\tStatus\tStarted\tCompleted\tDuration (s)\tRun ID")
 
 		for _, test := range output.Tests {
-			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, millisecondsToTime(test.Started), millisecondsToTime(test.Completed), displayDuration(test.Completed, test.Started), test.RunID)
+			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, DisplayTime(MillisecondsToTime(test.Started)), DisplayTime(MillisecondsToTime(test.Completed)), DisplayDuration(test.Completed, test.Started), DisplayRunId(test.RunID))
 			fmt.Fprintln(w, line)
 		}
 
@@ -159,37 +159,6 @@ func render(output *reflect.GetStatusOutput, format string) (string, error) {
 	}
 
 	return result, resultErr
-}
-
-func millisecondsToTime(t int) time.Time {
-	return time.Unix(int64(t/1000), 0)
-}
-
-func displayDuration(start int, end int) string {
-	if end == 0 || start == 0 {
-		return "-"
-	}
-
-	duration := float32(start-end) / float32(1000)
-
-	return fmt.Sprintf("%v", duration)
-}
-
-func areAllTestsComplete(output *reflect.GetStatusOutput) bool {
-	numComplete := 0
-
-	for _, test := range output.Tests {
-		if (test.Status == "succeeded") || (test.Status == "failed") {
-			numComplete++
-		}
-	}
-
-	return numComplete == len(output.Tests)
-}
-
-func isInputFromPipe() bool {
-	info, _ := os.Stdin.Stat()
-	return info.Mode()&os.ModeCharDevice != os.ModeCharDevice
 }
 
 func init() {
