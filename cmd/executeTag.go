@@ -49,16 +49,26 @@ to quickly create a Cobra application.`,
 			ApiKey: apiKey,
 		})
 
-		output, err := r.CreateTagExecution(tag)
+		var testExecutionOptions *reflect.TestExecutionOptions
+
+		if viper.IsSet("testExecutionOptions") {
+			testExecutionOptions = &reflect.TestExecutionOptions{}
+			err := viper.UnmarshalKey("testExecutionOptions", testExecutionOptions)
+			if err != nil {
+				return fmt.Errorf("executeTagCmd unmarshal options: %w", err)
+			}
+		}
+
+		output, err := r.CreateTagExecution(tag, testExecutionOptions)
 
 		if err != nil {
-			return err
+			return fmt.Errorf("executeTagCmd: %w", err)
 		}
 
 		jsonFormat, err := cmd.Flags().GetBool("json")
 
 		if err != nil {
-			return err
+			return fmt.Errorf("executeTagCmd: %w", err)
 		}
 
 		if jsonFormat {
