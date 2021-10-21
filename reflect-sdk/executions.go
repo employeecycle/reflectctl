@@ -27,7 +27,7 @@ func (r *Reflect) GetStatus(id string) (*GetStatusOutput, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/executions/%s", r.Url(), id), nil)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetStatus: %w", err)
 	}
 
 	req.Header.Add("X-API-KEY", r.ApiKey)
@@ -35,7 +35,7 @@ func (r *Reflect) GetStatus(id string) (*GetStatusOutput, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetStatus: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -45,6 +45,10 @@ func (r *Reflect) GetStatus(id string) (*GetStatusOutput, error) {
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("GetStatus: %w", err)
+	}
 
 	output := &GetStatusOutput{}
 	err = json.Unmarshal(body, output)

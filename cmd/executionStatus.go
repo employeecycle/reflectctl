@@ -53,7 +53,7 @@ Poll for live updates until all tests are complete with the -w flag:
 		if IsInputFromPipe() {
 			buffer, err := ioutil.ReadAll(os.Stdin)
 			if err != nil {
-				return err
+				return fmt.Errorf("executionStatusCmd: %w", err)
 			}
 
 			id = strings.TrimSuffix(string(buffer), "\n")
@@ -64,7 +64,7 @@ Poll for live updates until all tests are complete with the -w flag:
 		}
 
 		if id == "" {
-			return errors.New("Execution ID is required")
+			return errors.New("execution ID is required")
 		}
 
 		// apiKey, err := cmd.Flags().GetString("key")
@@ -77,13 +77,13 @@ Poll for live updates until all tests are complete with the -w flag:
 		output, err := r.GetStatus(id)
 
 		if err != nil {
-			return err
+			return fmt.Errorf("executionStatusCmd: %w", err)
 		}
 
 		jsonFormat, err := cmd.Flags().GetBool("json")
 
 		if err != nil {
-			return err
+			return fmt.Errorf("executionStatusCmd: %w", err)
 		}
 
 		format := ""
@@ -94,7 +94,7 @@ Poll for live updates until all tests are complete with the -w flag:
 
 		watch, err := cmd.Flags().GetBool("watch")
 		if err != nil {
-			return err
+			return fmt.Errorf("executionStatusCmd: %w", err)
 		}
 
 		if watch {
@@ -104,10 +104,10 @@ Poll for live updates until all tests are complete with the -w flag:
 			s := spinner.New(spinner.CharSets[4], 100*time.Millisecond)
 			s.Start()
 
-			for allComplete == false {
+			for !allComplete {
 				output, _ = r.GetStatus(id)
 				text, _ := render(output, format)
-				fmt.Fprintf(writer, text)
+				fmt.Fprint(writer, text)
 				time.Sleep(3 * time.Second)
 				allComplete = AreAllTestsComplete(output)
 			}
@@ -117,6 +117,10 @@ Poll for live updates until all tests are complete with the -w flag:
 		}
 
 		text, err := render(output, format)
+
+		if err != nil {
+			return fmt.Errorf("executionStatusCmd: %w", err)
+		}
 
 		fmt.Println(text)
 
@@ -142,7 +146,7 @@ func render(output *reflect.GetStatusOutput, format string) (string, error) {
 		var buf bytes.Buffer
 		w := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
 
-		fmt.Fprintln(w, fmt.Sprintf("\nStatus for execution %v:\n", output.ExecutionID))
+		fmt.Fprintf(w, "\nStatus for execution %v:\n\n", output.ExecutionID)
 
 		fmt.Fprintln(w, "Test ID\tStatus\tStarted\tCompleted\tDuration (s)\tRun ID")
 

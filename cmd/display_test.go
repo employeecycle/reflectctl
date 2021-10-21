@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -52,7 +51,7 @@ func TestMillisecondsToTime(t *testing.T) {
 
 	for _, test := range tests {
 		actual := MillisecondsToTime(test.input)
-		assert.Equal(t, fmt.Sprintf("%s", test.expected.Local()), fmt.Sprintf("%s", actual.Local()))
+		assert.Equal(t, test.expected.Local().String(), actual.Local().String())
 	}
 }
 
