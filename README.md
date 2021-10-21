@@ -1,7 +1,10 @@
 # reflectctl
+
 An unofficial CLI for [Reflect](https://reflect.run/).
 
 > NOTE: This project is very much under construction and therefore the code is unstable, largely untested and has high churn! Currently, it only implements a subset of the [Reflect API](https://reflect.run/docs/developer-api/documentation/). In most cases there is a clear path forward for adding more capabilities. PRs are welcome!
+
+![CI](https://github.com/employeecycle/reflectctl/actions/workflows/ci.yaml/badge.svg)
 
 # Installation
 Clone the reponsitory:
