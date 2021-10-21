@@ -16,19 +16,83 @@ limitations under the License.
 package cmd
 
 import (
+	"encoding/json"
+	"fmt"
+
+	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // executeCmd represents the execute command
 var executeCmd = &cobra.Command{
 	Use:   "execute",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Execute all tests or tests associated with a tag.",
+	Long: `Execute all tests:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	reflectctl execute
+
+Execute all tests tagged with "regression":
+
+	reflectctl execute tag regression
+
+This command returns a test ID which you can use to view the test status:
+
+	reflectctl executions status [test ID]
+
+This command accepts overrides in .reflectctl.yaml like this:
+
+	testExecutionOptions:
+		overrides:
+			cookies:
+			- name: someCookie
+				value: someCookieValue
+				maxAge: 123
+`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		apiKey := viper.GetViper().GetString("key")
+
+		r := reflect.NewReflect(&reflect.NewReflectInput{
+			ApiKey: apiKey,
+		})
+
+		var testExecutionOptions *reflect.TestExecutionOptions
+
+		if viper.IsSet("testExecutionOptions") {
+			testExecutionOptions = &reflect.TestExecutionOptions{}
+			err := viper.UnmarshalKey("testExecutionOptions", testExecutionOptions)
+			if err != nil {
+				return fmt.Errorf("executeTagCmd unmarshal options: %w", err)
+			}
+		}
+
+		output, err := r.CreateTagExecution("all", testExecutionOptions)
+
+		if err != nil {
+			return fmt.Errorf("executeTagCmd: %w", err)
+		}
+
+		jsonFormat, err := cmd.Flags().GetBool("json")
+
+		if err != nil {
+			return fmt.Errorf("executeTagCmd: %w", err)
+		}
+
+		if jsonFormat {
+			jsonOutput, err := json.Marshal(output)
+
+			if err != nil {
+				return nil
+			}
+
+			fmt.Println(string(jsonOutput))
+			return nil
+		}
+
+		fmt.Println(output.ExecutionID)
+
+		return nil
+	},
 }
 
 func init() {

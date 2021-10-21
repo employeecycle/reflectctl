@@ -36,13 +36,17 @@ import (
 // executionStatusCmd represents the executionStatus command
 var executionStatusCmd = &cobra.Command{
 	Use:   "status",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "View the status of a test execution",
+	Long: `View the status of test execution with execution ID 123:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	reflectctl executions status 123
+
+This will print a table with the execution status showing the test ID, status, timestamps, duration and run ID.
+
+Poll for live updates until all tests are complete with the -w flag:
+
+	reflectctl executions status 123 -w
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var id string
 

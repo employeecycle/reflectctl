@@ -27,13 +27,24 @@ import (
 // executeTagCmd represents the executeTag command
 var executeTagCmd = &cobra.Command{
 	Use:   "tag",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Execute all tests associated with a given tag",
+	Long: `Example running all tests tagged with "regression":
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	reflectctl execute tag regression
+
+This command returns a test ID which you can use to view the test status:
+
+	reflectctl executions status [test ID]
+
+This command accepts overrides in .reflectctl.yaml like this:
+
+	testExecutionOptions:
+		overrides:
+			cookies:
+			- name: someCookie
+				value: someCookieValue
+				maxAge: 123
+`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var tag string
 
