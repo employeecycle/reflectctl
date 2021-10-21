@@ -31,12 +31,12 @@ func MillisecondsToTime(t int) time.Time {
 	return time.Unix(int64(t/1000), 0)
 }
 
-func DisplayDuration(start int, end int) string {
+func DisplayDuration(end int, start int) string {
 	if end == 0 || start == 0 {
 		return "-"
 	}
 
-	duration := float32(start-end) / float32(1000)
+	duration := float32(end-start) / float32(1000)
 
 	return fmt.Sprintf("%v", duration)
 }
