@@ -1,7 +1,7 @@
 # reflectctl
 An unofficial CLI for [Reflect](https://reflect.run/).
 
-> NOTE: This project is very much under construction and therefore the code is unstable, largely untested and has high churn! Currently, it only implements a subset of the (Reflect API)[https://reflect.run/docs/developer-api/documentation/]. In most cases there is a clear path forward for adding more capabilities. PRs are welcome!
+> NOTE: This project is very much under construction and therefore the code is unstable, largely untested and has high churn! Currently, it only implements a subset of the [Reflect API](https://reflect.run/docs/developer-api/documentation/). In most cases there is a clear path forward for adding more capabilities. PRs are welcome!
 
 # Installation
 Clone the reponsitory:
