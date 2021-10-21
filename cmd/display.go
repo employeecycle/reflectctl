@@ -7,7 +7,7 @@ import (
 	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 )
 
-func DisplayRunId(id int) string {
+func DisplayRunID(id int) string {
 	if id == 0 {
 		return "-"
 	}

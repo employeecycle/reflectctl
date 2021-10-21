@@ -15,7 +15,7 @@ type CookieOverride struct {
 	Value    string `mapstructure:"value" json:"value"`
 	Domain   string `mapstructure:"domain" json:"domain"`
 	Expires  int32  `mapstructure:"expires" json:"expires"`
-	HttpOnly bool   `mapstructure:"httpOnly" json:"httpOnly"`
+	HTTPOnly bool   `mapstructure:"httpOnly" json:"httpOnly"`
 	MaxAge   int32  `mapstructure:"maxAge" json:"maxAge"`
 	Path     string `mapstructure:"path" json:"path"`
 	Secure   bool   `mapstructure:"secure" json:"secure"`
@@ -51,13 +51,13 @@ func (r *Reflect) CreateTagExecution(tag string, options *TestExecutionOptions) 
 		reqBody = bytes.NewBuffer(reqBytes)
 	}
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/tags/%s/executions", r.Url(), tag), reqBody)
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/tags/%s/executions", r.URL(), tag), reqBody)
 
 	if err != nil {
 		return nil, fmt.Errorf("CreateTagExecution: %w", err)
 	}
 
-	req.Header.Add("X-API-KEY", r.ApiKey)
+	req.Header.Add("X-API-KEY", r.APIKey)
 
 	resp, err := client.Do(req)
 

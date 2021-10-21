@@ -17,7 +17,7 @@ func TestDisplayRunId(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		assert.Equal(t, test.expected, DisplayRunId(test.input))
+		assert.Equal(t, test.expected, DisplayRunID(test.input))
 	}
 }
 

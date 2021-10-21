@@ -24,13 +24,13 @@ type GetStatusOutput struct {
 func (r *Reflect) GetStatus(id string) (*GetStatusOutput, error) {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/executions/%s", r.Url(), id), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/executions/%s", r.URL(), id), nil)
 
 	if err != nil {
 		return nil, fmt.Errorf("GetStatus: %w", err)
 	}
 
-	req.Header.Add("X-API-KEY", r.ApiKey)
+	req.Header.Add("X-API-KEY", r.APIKey)
 
 	resp, err := client.Do(req)
 
