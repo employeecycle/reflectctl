@@ -53,8 +53,8 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.reflectctl.yaml)")
-	rootCmd.PersistentFlags().StringP("key", "k", "", "API Key")
-	rootCmd.PersistentFlags().BoolP("json", "j", false, "Format output as JSON. Can also be supplied by REFLECT_KEY environment variable")
+	rootCmd.PersistentFlags().StringP("key", "k", "", "API Key. Can also be supplied by REFLECT_KEY environment variable")
+	rootCmd.PersistentFlags().BoolP("json", "j", false, "Format output as JSON.")
 
 	viper.BindPFlag("key", rootCmd.PersistentFlags().Lookup("key"))
 
