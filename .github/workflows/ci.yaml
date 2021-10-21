@@ -7,5 +7,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Install dependencies
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@latest
       - name: Run tests
         run: make test
+      - name: Run linter
+        run: make lint
+      
