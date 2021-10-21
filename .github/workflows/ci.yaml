@@ -13,7 +13,7 @@ jobs:
       - name: Install dependencies
         run: |
           go mod download
-          go install honnef.co/go/tools/cmd/staticcheck
+          go install honnef.co/go/tools/cmd/staticcheck@latest
       - name: Run linter
         run: make lint
       - name: Run tests
