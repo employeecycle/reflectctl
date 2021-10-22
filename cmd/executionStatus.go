@@ -52,7 +52,6 @@ Poll for live updates until all tests are complete with the -w flag:
 			return errors.New("execution ID is required")
 		}
 
-		// apiKey, err := cmd.Flags().GetString("key")
 		apiKey := viper.GetViper().GetString("key")
 
 		r := reflect.NewReflect(&reflect.NewReflectInput{
@@ -65,16 +64,16 @@ Poll for live updates until all tests are complete with the -w flag:
 			return fmt.Errorf("executionStatusCmd: %w", err)
 		}
 
-		jsonFormat, err := cmd.Flags().GetBool("json")
+		isJSONFormat, err := cmd.Flags().GetBool("json")
 
 		if err != nil {
 			return fmt.Errorf("executionStatusCmd: %w", err)
 		}
 
-		format := ""
+		var format DisplayFormat
 
-		if jsonFormat {
-			format = "json"
+		if isJSONFormat {
+			format = JSON
 		}
 
 		watch, err := cmd.Flags().GetBool("watch")
@@ -83,42 +82,54 @@ Poll for live updates until all tests are complete with the -w flag:
 		}
 
 		if watch {
-			writer := uilive.New()
-			writer.Start()
-			allComplete := false
-			s := spinner.New(spinner.CharSets[4], 100*time.Millisecond)
-			s.Start()
-
-			for !allComplete {
-				output, _ = r.GetStatus(id)
-				text, _ := render(output, format)
-				fmt.Fprint(writer, text)
-				time.Sleep(3 * time.Second)
-				allComplete = AreAllTestsComplete(output)
-			}
-
-			s.Stop()
+			renderWithWatcher(r, id, format)
 			return nil
 		}
 
-		text, err := render(output, format)
+		err = renderOnce(output, format)
 
 		if err != nil {
 			return fmt.Errorf("executionStatusCmd: %w", err)
 		}
 
-		fmt.Println(text)
-
 		return nil
 	},
 }
 
-func render(output *reflect.GetStatusOutput, format string) (string, error) {
+func renderOnce(output *reflect.GetStatusOutput, format DisplayFormat) error {
+	text, err := render(output, format)
+	if err != nil {
+		return fmt.Errorf("renderOnce: %w", err)
+	}
+
+	fmt.Println(text)
+	return nil
+}
+
+func renderWithWatcher(r *reflect.Reflect, id string, format DisplayFormat) {
+	writer := uilive.New()
+	writer.Start()
+	allComplete := false
+	s := spinner.New(spinner.CharSets[4], 100*time.Millisecond)
+	s.Start()
+
+	for !allComplete {
+		output, _ := r.GetStatus(id)
+		text, _ := render(output, format)
+		fmt.Fprint(writer, text)
+		time.Sleep(3 * time.Second)
+		allComplete = AreAllTestsComplete(output)
+	}
+
+	s.Stop()
+}
+
+func render(output *reflect.GetStatusOutput, format DisplayFormat) (string, error) {
 	result := ""
 	var resultErr error
 
 	switch format {
-	case "json":
+	case JSON:
 		jsonOutput, err := json.Marshal(output)
 
 		if err != nil {

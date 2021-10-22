@@ -7,6 +7,13 @@ import (
 	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 )
 
+type DisplayFormat int64
+
+const (
+	JSON DisplayFormat = iota
+	Text
+)
+
 func DisplayRunID(id int) string {
 	if id == 0 {
 		return "-"
