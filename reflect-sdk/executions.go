@@ -2,7 +2,6 @@ package reflect
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -41,7 +40,7 @@ func (r *Reflect) GetStatus(id string) (*GetStatusOutput, error) {
 	defer resp.Body.Close()
 
 	if !httpStatusOk(resp.StatusCode) {
-		return nil, errors.New(resp.Status)
+		return nil, fmt.Errorf("GetStatus: response status code %s", resp.Status)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -54,7 +53,7 @@ func (r *Reflect) GetStatus(id string) (*GetStatusOutput, error) {
 	err = json.Unmarshal(body, output)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("GetStatus: %w", err)
 	}
 
 	return output, nil

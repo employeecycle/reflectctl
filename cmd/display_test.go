@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -71,6 +72,49 @@ func TestDisplayDuration(t *testing.T) {
 
 	for _, test := range tests {
 		actual := DisplayDuration(test.input.end, test.input.start)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestAreAllTestsComplete(t *testing.T) {
+	tests := []struct {
+		input    *reflect.GetStatusOutput
+		expected bool
+	}{
+		{
+			input: &reflect.GetStatusOutput{
+				Tests: []reflect.Test{
+					{Status: "succeeded"},
+					{Status: "succeeded"},
+					{Status: "succeeded"},
+				},
+			},
+			expected: true,
+		},
+		{
+			input: &reflect.GetStatusOutput{
+				Tests: []reflect.Test{
+					{Status: "failed"},
+					{Status: "failed"},
+					{Status: "failed"},
+				},
+			},
+			expected: true,
+		},
+		{
+			input: &reflect.GetStatusOutput{
+				Tests: []reflect.Test{
+					{Status: "failed"},
+					{Status: "failed"},
+					{Status: "pending"},
+				},
+			},
+			expected: false,
+		},
+	}
+
+	for _, test := range tests {
+		actual := AreAllTestsComplete(test.input)
 		assert.Equal(t, test.expected, actual)
 	}
 }

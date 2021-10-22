@@ -3,7 +3,6 @@ package reflect
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -68,7 +67,7 @@ func (r *Reflect) CreateTagExecution(tag string, options *TestExecutionOptions) 
 	defer resp.Body.Close()
 
 	if !httpStatusOk(resp.StatusCode) {
-		return nil, errors.New(resp.Status)
+		return nil, fmt.Errorf("CreateTagExecution: response status code %s", resp.Status)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
