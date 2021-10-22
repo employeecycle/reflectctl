@@ -10,8 +10,8 @@ import (
 type DisplayFormat int64
 
 const (
-	JSON DisplayFormat = iota
-	Text
+	Text DisplayFormat = iota
+	JSON
 )
 
 func DisplayRunID(id int) string {
