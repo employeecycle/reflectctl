@@ -97,7 +97,7 @@ Poll for live updates until all tests are complete with the -w flag:
 }
 
 func renderOnce(output *reflect.GetStatusOutput, format DisplayFormat) error {
-	text, err := render(output, format)
+	text, err := render(renderParams{output: output, format: format})
 	if err != nil {
 		return fmt.Errorf("renderOnce: %w", err)
 	}
@@ -115,7 +115,7 @@ func renderWithWatcher(r *reflect.Reflect, id string, format DisplayFormat) {
 
 	for !allComplete {
 		output, _ := r.GetStatus(id)
-		text, _ := render(output, format)
+		text, _ := render(renderParams{output: output, format: format})
 		fmt.Fprint(writer, text)
 		time.Sleep(3 * time.Second)
 		allComplete = AreAllTestsComplete(output)
@@ -124,13 +124,24 @@ func renderWithWatcher(r *reflect.Reflect, id string, format DisplayFormat) {
 	s.Stop()
 }
 
-func render(output *reflect.GetStatusOutput, format DisplayFormat) (string, error) {
+type renderParams struct {
+	output   *reflect.GetStatusOutput
+	format   DisplayFormat
+	timezone *time.Location
+}
+
+func render(p renderParams) (string, error) {
 	result := ""
 	var resultErr error
 
-	switch format {
+	if p.timezone == nil {
+		t := time.Now()
+		p.timezone = t.Location()
+	}
+
+	switch p.format {
 	case JSON:
-		jsonOutput, err := json.Marshal(output)
+		jsonOutput, err := json.Marshal(p.output)
 
 		if err != nil {
 			resultErr = err
@@ -142,12 +153,12 @@ func render(output *reflect.GetStatusOutput, format DisplayFormat) (string, erro
 		var buf bytes.Buffer
 		w := tabwriter.NewWriter(&buf, 0, 0, 2, ' ', 0)
 
-		fmt.Fprintf(w, "\nStatus for execution %v:\n\n", output.ExecutionID)
+		fmt.Fprintf(w, "\nStatus for execution %v:\n\n", p.output.ExecutionID)
 
 		fmt.Fprintln(w, "Test ID\tStatus\tStarted\tCompleted\tDuration (s)\tRun ID")
 
-		for _, test := range output.Tests {
-			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, DisplayTime(MillisecondsToTime(test.Started)), DisplayTime(MillisecondsToTime(test.Completed)), DisplayDuration(test.Completed, test.Started), DisplayRunID(test.RunID))
+		for _, test := range p.output.Tests {
+			line := fmt.Sprintf("%v\t%v\t%v\t%v\t%v\t%v", test.TestID, test.Status, DisplayTime(MillisecondsToTime(test.Started).In(p.timezone)), DisplayTime(MillisecondsToTime(test.Completed).In(p.timezone)), DisplayDuration(test.Completed, test.Started), DisplayRunID(test.RunID))
 			fmt.Fprintln(w, line)
 		}
 
