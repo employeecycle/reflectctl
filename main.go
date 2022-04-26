@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/jasonblanchard/reflectctl/cmd"
+import "github.com/employeecycle/reflectctl/cmd"
 
 func main() {
 	cmd.Execute()

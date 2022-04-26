@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/briandowns/spinner"
+	"github.com/employeecycle/reflectctl/reflect-sdk"
 	"github.com/gosuri/uilive"
-	"github.com/jasonblanchard/reflectctl/reflect-sdk"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

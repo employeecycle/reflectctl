@@ -1,4 +1,4 @@
-module github.com/jasonblanchard/reflectctl
+module github.com/employeecycle/reflectctl
 
 go 1.16
 
