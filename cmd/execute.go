@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/jasonblanchard/reflectctl/reflect-sdk"
+	"github.com/employeecycle/reflectctl/reflect-sdk"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
