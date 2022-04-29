@@ -74,7 +74,7 @@ type SuiteCookieOverride struct {
 }
 
 type SuiteOverrides struct {
-	Cookies []CookieOverride `mapstructure:"cookies" json:"cookies"`
+	Cookies []SuiteCookieOverride `mapstructure:"cookies" json:"cookies"`
 }
 
 type ExecuteSuiteOutput struct {
