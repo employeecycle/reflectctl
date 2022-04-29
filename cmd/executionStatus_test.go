@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/employeecycle/reflectctl/reflect-sdk"
+	"github.com/employeecycle/reflectctl/sdk/reflect"
 	"github.com/stretchr/testify/assert"
 )
 
